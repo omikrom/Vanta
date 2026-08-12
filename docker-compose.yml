@@ -15,4 +15,5 @@ services:
       # Change these paths to match the media folders on your server.
       - /path/to/movies:/media/movies:ro
       - /path/to/series:/media/series:ro
-      - /path/to/music:/media/music:ro
+      # Music is writable so authorised YouTube imports can be filed here.
+      - /path/to/music:/media/music

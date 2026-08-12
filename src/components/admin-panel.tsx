@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 import { ArrowLeft, CheckCircle2, Film, FolderOpen, HardDrive, LoaderCircle, Music2, Plus, RefreshCw, Server, ShieldCheck, Trash2, Tv, UserPlus, UserRound } from "lucide-react";
 import { VantaMark } from "@/components/brand";
+import { YouTubeImporter } from "@/components/youtube-importer";
 import type { Library, MediaKind, SafeUser } from "@/lib/types";
 
 function kindIcon(kind: MediaKind) { if (kind === "music") return <Music2 />; if (kind === "series") return <Tv />; return <Film />; }
@@ -65,6 +66,7 @@ export function AdminPanel({ user, libraries, users }: { user: SafeUser; librari
           <div className="admin-section-heading"><div><h2>Media libraries</h2><p>Scan folders again whenever you add or rename files.</p></div></div>
           {!libraries.length ? <div className="admin-empty"><FolderOpen size={42} /><h3>No folders connected</h3><p>Add the folders where you keep your movies, series or music.</p><button className="secondary-button" onClick={() => setAdding(true)}><Plus size={18} />Connect a folder</button></div> : <div className="library-list">{libraries.map((library) => <article className="library-item" key={library.id}><span className={`library-icon icon-${library.kind}`}>{kindIcon(library.kind)}</span><div className="library-copy"><div><h3>{library.name}</h3><span>{library.kind}</span></div><code>{library.path}</code><p>{library.itemCount} items · {library.lastScannedAt ? `Scanned ${new Date(library.lastScannedAt).toLocaleString()}` : "Not scanned yet"}</p></div><div className="library-actions"><button onClick={() => void scan(library.id)} disabled={Boolean(workingId)} title="Scan now">{workingId === library.id ? <LoaderCircle className="spin" /> : <RefreshCw />}</button><button className="danger-icon" onClick={() => void remove(library.id, library.name)} disabled={Boolean(workingId)} title="Remove library"><Trash2 /></button></div></article>)}</div>}
         </section>
+        <YouTubeImporter libraries={libraries} />
         <section className="admin-section">
           <div className="admin-section-heading split-heading"><div><h2>People with access</h2><p>Viewer accounts have access to every media library, but not the control room.</p></div><button className="secondary-button" onClick={() => setAddingViewer(true)}><UserPlus size={17} />Add viewer</button></div>
           <div className="people-list">{users.map((person) => <article key={person.id}><span className="person-avatar">{person.displayName.slice(0, 1).toUpperCase()}</span><div><strong>{person.displayName}</strong><small>@{person.username} · {person.role === "admin" ? "Owner" : "Viewer"}</small></div>{person.role === "viewer" && <button onClick={() => void removeViewer(person)} disabled={Boolean(workingId)} title="Remove access"><Trash2 /></button>}</article>)}</div>

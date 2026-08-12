@@ -50,3 +50,12 @@ export interface HomeFeed {
   series: MediaItem[];
   music: MediaItem[];
 }
+
+export interface YouTubeSearchResult {
+  id: string;
+  title: string;
+  channel: string;
+  duration: number | null;
+  thumbnailUrl: string | null;
+  url: string;
+}

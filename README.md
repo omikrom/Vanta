@@ -20,6 +20,7 @@ The current release is the media foundation for a wider home-server platform. Pr
 - Automatic FFmpeg-to-HLS conversion for formats such as MKV and AVI
 - Resume position, completion tracking and continue-watching rows
 - Search across titles, series, artists and albums
+- Owner-only YouTube search and authorised audio import into artist/album folders
 - Docker and native Node.js operation
 
 ## Quick start with Docker
@@ -41,11 +42,17 @@ docker compose up -d --build
 /media/music
 ```
 
-The `:ro` volume suffix makes the media folders read-only inside Vanta. Its database and generated playback cache live in `./data` and survive container restarts.
+The movie and series mounts use `:ro`, so they stay read-only inside Vanta. The music mount is writable to support authorised YouTube imports. Vanta's database and generated playback cache live in `./data` and survive container restarts.
 
 ## Run directly on Windows, macOS or Linux
 
-Vanta requires Node.js 22+ and FFmpeg. FFmpeg only needs to be on `PATH` unless `FFMPEG_PATH` points somewhere else.
+Vanta requires Node.js 22+ and FFmpeg. YouTube search/import also requires [yt-dlp](https://github.com/yt-dlp/yt-dlp); the official project currently recommends its nightly channel for regular users. FFmpeg and yt-dlp only need to be on `PATH` unless their environment variables point somewhere else.
+
+One supported way to install the current yt-dlp nightly is:
+
+```bash
+python -m pip install -U --pre "yt-dlp[default]"
+```
 
 ```bash
 npm install
@@ -88,6 +95,25 @@ Put local artwork next to a title using any of these names:
 
 Set `TMDB_API_KEY` to enrich movies and series that do not have local artwork. This product uses the TMDB API but is not endorsed or certified by TMDB.
 
+## Import authorised audio from YouTube
+
+Open **Control room → YouTube Import**, search for a song or performance, and choose **Import audio**. Vanta asks you for:
+
+- the writable music library to use
+- artist, album and track title
+- confirmation that you own the content, have permission, or it is licensed for downloading
+
+Vanta extracts the best available audio to MP3, embeds the source metadata, keeps a matching JPG thumbnail as cover art and saves it as:
+
+```text
+Music Library/Artist/Album/Track title.mp3
+Music Library/Artist/Album/Track title.jpg
+```
+
+The music library is rescanned automatically, so the track immediately becomes part of that artist and album in the gallery. Search and import are available only to the Vanta owner.
+
+This feature does not grant rights to YouTube content or override YouTube's terms. Use it only where the creator, licence or your ownership permits downloading. It intentionally does not accept arbitrary server output paths or playlists.
+
 ## Configuration
 
 | Variable | Default | Purpose |
@@ -97,6 +123,7 @@ Set `TMDB_API_KEY` to enrich movies and series that do not have local artwork. T
 | `VANTA_SECURE_COOKIES` | `false` | Set to `true` when Vanta is served over HTTPS |
 | `TMDB_API_KEY` | unset | Optional movie and series metadata |
 | `FFMPEG_PATH` | `ffmpeg` | FFmpeg executable path |
+| `YTDLP_PATH` | `yt-dlp` | yt-dlp executable path for YouTube search/import |
 | `VANTA_TRANSCODE_PRESET` | `veryfast` | FFmpeg x264 speed/quality preset |
 | `VANTA_TRANSCODE_CRF` | `21` | FFmpeg x264 quality value; lower is higher quality |
 | `PORT` | `3000` | HTTP port for production |
@@ -107,7 +134,7 @@ Do not expose port 3000 directly to the public internet. Put Vanta behind HTTPS 
 
 The application checks authorization again at every media, artwork, progress, library and account endpoint. Server paths are never included in browser-facing media objects.
 
-Only share media you have the legal right to store and stream. Viewer accounts are intended for private household/family use, not running a public streaming service.
+Only download, store and share media you have the legal right to use. Viewer accounts are intended for private household/family use, not running a public streaming service.
 
 ## Development
 

@@ -19,7 +19,8 @@ ENV NODE_ENV=production \
     VANTA_DATA_DIR=/data \
     VANTA_CACHE_DIR=/data/cache
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends ffmpeg ca-certificates \
+    && apt-get install -y --no-install-recommends ffmpeg ca-certificates python3 python3-pip \
+    && python3 -m pip install --break-system-packages --no-cache-dir --pre "yt-dlp[default]" \
     && rm -rf /var/lib/apt/lists/* \
     && groupadd --system --gid 1001 vanta \
     && useradd --system --uid 1001 --gid vanta vanta \
