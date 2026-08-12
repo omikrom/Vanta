@@ -85,6 +85,17 @@ function openDatabase() {
       updated_at INTEGER NOT NULL,
       PRIMARY KEY(user_id, media_id)
     );
+
+    CREATE TABLE IF NOT EXISTS file_roots (
+      id TEXT PRIMARY KEY,
+      name TEXT NOT NULL,
+      path TEXT NOT NULL UNIQUE,
+      access TEXT NOT NULL DEFAULT 'private' CHECK(access IN ('private', 'shared')),
+      writable INTEGER NOT NULL DEFAULT 1,
+      created_at INTEGER NOT NULL
+    );
+
+    CREATE INDEX IF NOT EXISTS file_roots_access_idx ON file_roots(access);
   `);
 
   return database;

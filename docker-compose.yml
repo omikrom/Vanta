@@ -17,3 +17,5 @@ services:
       - /path/to/series:/media/series:ro
       # Music is writable so authorised YouTube imports can be filed here.
       - /path/to/music:/media/music
+      # General file storage is writable for the Vanta Files workspace.
+      - /path/to/files:/storage

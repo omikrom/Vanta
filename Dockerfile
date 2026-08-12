@@ -24,10 +24,10 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/* \
     && groupadd --system --gid 1001 vanta \
     && useradd --system --uid 1001 --gid vanta vanta \
-    && mkdir -p /data /media \
-    && chown -R vanta:vanta /data /media /app
+    && mkdir -p /data /media /storage \
+    && chown -R vanta:vanta /data /media /storage /app
 COPY --from=builder --chown=vanta:vanta /app/.next/standalone ./
 USER vanta
 EXPOSE 3000
-VOLUME ["/data", "/media"]
+VOLUME ["/data", "/media", "/storage"]
 CMD ["node", "server.js"]

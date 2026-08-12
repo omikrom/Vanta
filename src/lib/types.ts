@@ -59,3 +59,34 @@ export interface YouTubeSearchResult {
   thumbnailUrl: string | null;
   url: string;
 }
+
+export type FileRootAccess = "private" | "shared";
+
+export interface FileRootSummary {
+  id: string;
+  name: string;
+  access: FileRootAccess;
+  writable: boolean;
+  totalBytes: number | null;
+  freeBytes: number | null;
+  createdAt: number;
+}
+
+export interface FileRoot extends FileRootSummary {
+  path: string;
+}
+
+export interface FileEntry {
+  name: string;
+  relativePath: string;
+  kind: "folder" | "file";
+  size: number;
+  modifiedAt: number;
+  mimeType: string | null;
+}
+
+export interface FileDirectoryView {
+  root: FileRootSummary;
+  relativePath: string;
+  entries: FileEntry[];
+}

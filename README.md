@@ -2,9 +2,9 @@
 
 **Your world, on demand.**
 
-Vanta is a private, self-hosted home for movies, TV series and music. Point it at folders on your server and it turns them into a polished streaming library for the people you trust. Your media stays on your hardware and Vanta never moves or deletes the original files.
+Vanta is a private, self-hosted home for movies, TV series, music and ordinary files. Point it at folders on your server and it turns them into a polished streaming library and private NAS workspace for the people you trust. Your data stays on your hardware.
 
-The current release is the media foundation for a wider home-server platform. Private file storage, uploads, downloads and NAS management are represented in the product now and planned as the next major phase.
+The current release combines the media foundation with the first functional NAS workspace. Plex is not required; Vanta scans, streams and manages its own configured folders.
 
 ## What already works
 
@@ -21,6 +21,10 @@ The current release is the media foundation for a wider home-server platform. Pr
 - Resume position, completion tracking and continue-watching rows
 - Search across titles, series, artists and albums
 - Owner-only YouTube search and authorised audio import into artist/album folders
+- Private and shared file-storage locations backed by ordinary server folders
+- Folder browsing, multi-file streaming uploads, downloads and rename operations
+- Recoverable deletion into a hidden `.vanta-trash` folder rather than permanent erasure
+- Storage capacity and free-space visibility
 - Docker and native Node.js operation
 
 ## Quick start with Docker
@@ -40,9 +44,12 @@ docker compose up -d --build
 /media/movies
 /media/series
 /media/music
+/storage
 ```
 
-The movie and series mounts use `:ro`, so they stay read-only inside Vanta. The music mount is writable to support authorised YouTube imports. Vanta's database and generated playback cache live in `./data` and survive container restarts.
+The movie and series mounts use `:ro`, so they stay read-only inside Vanta. The music mount is writable to support authorised YouTube imports, and `/storage` is writable for Vanta Files. Vanta's database and generated playback cache live in `./data` and survive container restarts.
+
+Open **Files → Connect storage** and use `/storage` as the folder path. You can connect more mounted folders later.
 
 ## Run directly on Windows, macOS or Linux
 
@@ -114,6 +121,18 @@ The music library is rescanned automatically, so the track immediately becomes p
 
 This feature does not grant rights to YouTube content or override YouTube's terms. Use it only where the creator, licence or your ownership permits downloading. It intentionally does not accept arbitrary server output paths or playlists.
 
+## Use Vanta as private file storage
+
+Open **Files** and connect any existing folder on the server. Each location can be:
+
+- **Owner only** — completely hidden from viewer accounts
+- **Shared** — viewers can browse and download; only the owner can make changes
+- **Writable or read-only** — writable locations enable uploads, folders, renaming and recovery
+
+Vanta confines every operation to the configured storage root, ignores symbolic links and never exposes the server path to viewers. Moving an item to trash places it inside a hidden `.vanta-trash` directory at the root. Vanta intentionally does not permanently empty that directory yet; inspect or back it up on the server before removing anything from it manually.
+
+Uploads stream directly to disk instead of buffering the entire file in memory. The default per-file limit is 20 GiB and can be changed with `VANTA_MAX_UPLOAD_BYTES`. If Vanta is behind a reverse proxy, its request-body limit and timeout must be at least as large as Vanta's.
+
 ## Configuration
 
 | Variable | Default | Purpose |
@@ -124,6 +143,7 @@ This feature does not grant rights to YouTube content or override YouTube's term
 | `TMDB_API_KEY` | unset | Optional movie and series metadata |
 | `FFMPEG_PATH` | `ffmpeg` | FFmpeg executable path |
 | `YTDLP_PATH` | `yt-dlp` | yt-dlp executable path for YouTube search/import |
+| `VANTA_MAX_UPLOAD_BYTES` | `21474836480` | Maximum size of each Files upload (20 GiB) |
 | `VANTA_TRANSCODE_PRESET` | `veryfast` | FFmpeg x264 speed/quality preset |
 | `VANTA_TRANSCODE_CRF` | `21` | FFmpeg x264 quality value; lower is higher quality |
 | `PORT` | `3000` | HTTP port for production |
@@ -132,7 +152,7 @@ This feature does not grant rights to YouTube content or override YouTube's term
 
 Do not expose port 3000 directly to the public internet. Put Vanta behind HTTPS using a reverse proxy such as Caddy, Nginx or Cloudflare Tunnel, then set `VANTA_SECURE_COOKIES=true`. A private mesh VPN such as Tailscale is also a good fit for family-only access.
 
-The application checks authorization again at every media, artwork, progress, library and account endpoint. Server paths are never included in browser-facing media objects.
+The application checks authorization again at every media, artwork, progress, library, file and account endpoint. Server paths are never included in viewer-facing objects.
 
 Only download, store and share media you have the legal right to use. Viewer accounts are intended for private household/family use, not running a public streaming service.
 
@@ -154,13 +174,15 @@ src/components/      Interactive browse, playback and control-room UI
 src/server/auth.ts   Users, sessions and authorization
 src/server/media/    Filename parsing, scanning, metadata and queries
 src/server/playback.ts  Byte ranges and FFmpeg HLS preparation
+src/server/files.ts     Storage-root jailing and file operations
 data/                Runtime SQLite database and cache (gitignored)
 ```
 
 ## Roadmap
 
-- File explorer with upload, download and folders
-- Storage health and disk usage
+- Recovery-bin browser and explicit restore/permanent-delete controls
+- Drag-and-drop uploads and resumable transfer sessions
+- Per-location and per-folder sharing rules
 - Viewer password changes and invitation links
 - Automatic scheduled scans and filesystem watching
 - Subtitle discovery and track selection

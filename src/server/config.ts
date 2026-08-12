@@ -14,6 +14,11 @@ export const DATABASE_PATH = path.join(DATA_DIR, "vanta.db");
 export const SESSION_COOKIE = "vanta_session";
 export const SESSION_TTL_MS = 1000 * 60 * 60 * 24 * 30;
 
+const configuredUploadLimit = Number(process.env.VANTA_MAX_UPLOAD_BYTES);
+export const MAX_UPLOAD_BYTES = Number.isFinite(configuredUploadLimit) && configuredUploadLimit > 0
+  ? configuredUploadLimit
+  : 20 * 1024 ** 3;
+
 export const VIDEO_EXTENSIONS = new Set([
   ".mp4",
   ".m4v",

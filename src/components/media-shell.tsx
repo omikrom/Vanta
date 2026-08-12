@@ -104,7 +104,7 @@ export function MediaShell({ user, feed, initialView }: { user: SafeUser; feed: 
         <Link href="/browse" className="brand-link"><VantaMark /></Link>
         <nav className={mobileMenu ? "nav-links nav-links-open" : "nav-links"}>
           {views.map((view) => <Link key={view.id} href={view.id === "home" ? "/browse" : `/browse?view=${view.id}`} className={initialView === view.id ? "active" : ""} onClick={() => setMobileMenu(false)}>{view.icon}{view.label}</Link>)}
-          <Link href="/files" className="coming-soon-link"><FolderOpen size={18} />Files<span>Soon</span></Link>
+          <Link href="/files"><FolderOpen size={18} />Files</Link>
         </nav>
         <div className="nav-actions">
           <button onClick={() => setSearchOpen(true)} aria-label="Search"><Search size={20} /></button>
@@ -132,7 +132,7 @@ export function MediaShell({ user, feed, initialView }: { user: SafeUser; feed: 
         </main>
       )}
 
-      <nav className="bottom-nav">{views.map((view) => <Link key={view.id} className={initialView === view.id ? "active" : ""} href={view.id === "home" ? "/browse" : `/browse?view=${view.id}`}>{view.icon}<span>{view.label}</span></Link>)}</nav>
+      <nav className="bottom-nav">{views.map((view) => <Link key={view.id} className={initialView === view.id ? "active" : ""} href={view.id === "home" ? "/browse" : `/browse?view=${view.id}`}>{view.icon}<span>{view.label}</span></Link>)}<Link href="/files"><FolderOpen size={18} /><span>Files</span></Link></nav>
       {selected && <DetailPanel item={selected} onClose={() => setSelected(null)} onPlay={() => play(selected)} />}
       {playing && <PlayerOverlay item={playing} onClose={() => { setPlaying(null); router.refresh(); }} />}
       {searchOpen && <div className="search-overlay"><div className="search-bar"><Search size={24} /><input autoFocus value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Movies, series, songs, artists…" /><button onClick={() => { setSearchOpen(false); setQuery(""); }} aria-label="Close search"><X /></button></div><div className="search-content">{!query && <div className="search-prompt"><Search size={44} /><h2>Search your world</h2><p>Everything on this Vanta server, in one place.</p></div>}{query && !searchResults.length && <div className="search-prompt"><h2>No matches</h2><p>Try another title, artist or album.</p></div>}{searchResults.length > 0 && <div className="search-grid">{searchResults.map((item) => <MediaCard key={item.id} item={item} onOpen={(match) => { setSearchOpen(false); setSelected(match); setQuery(""); }} />)}</div>}</div></div>}
