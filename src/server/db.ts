@@ -96,6 +96,46 @@ function openDatabase() {
     );
 
     CREATE INDEX IF NOT EXISTS file_roots_access_idx ON file_roots(access);
+
+    CREATE TABLE IF NOT EXISTS game_libraries (
+      id TEXT PRIMARY KEY,
+      name TEXT NOT NULL,
+      system TEXT NOT NULL,
+      path TEXT NOT NULL UNIQUE,
+      bios_path TEXT,
+      last_scanned_at INTEGER,
+      created_at INTEGER NOT NULL
+    );
+
+    CREATE TABLE IF NOT EXISTS game_items (
+      id TEXT PRIMARY KEY,
+      library_id TEXT NOT NULL REFERENCES game_libraries(id) ON DELETE CASCADE,
+      title TEXT NOT NULL,
+      sort_title TEXT NOT NULL,
+      file_path TEXT NOT NULL,
+      file_size INTEGER NOT NULL,
+      extension TEXT NOT NULL,
+      cover_path TEXT,
+      background_path TEXT,
+      added_at INTEGER NOT NULL,
+      updated_at INTEGER NOT NULL,
+      seen_at INTEGER NOT NULL,
+      UNIQUE(library_id, file_path)
+    );
+
+    CREATE INDEX IF NOT EXISTS game_items_library_idx ON game_items(library_id);
+    CREATE INDEX IF NOT EXISTS game_items_sort_idx ON game_items(sort_title);
+
+    CREATE TABLE IF NOT EXISTS game_activity (
+      user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      game_id TEXT NOT NULL REFERENCES game_items(id) ON DELETE CASCADE,
+      last_played_at INTEGER,
+      play_count INTEGER NOT NULL DEFAULT 0,
+      favorite INTEGER NOT NULL DEFAULT 0,
+      PRIMARY KEY(user_id, game_id)
+    );
+
+    CREATE INDEX IF NOT EXISTS game_activity_recent_idx ON game_activity(user_id, last_played_at DESC);
   `);
 
   return database;

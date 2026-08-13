@@ -90,3 +90,46 @@ export interface FileDirectoryView {
   relativePath: string;
   entries: FileEntry[];
 }
+
+export type { GameSystem } from "@/lib/games";
+import type { GameSystem } from "@/lib/games";
+
+export interface GameLibrary {
+  id: string;
+  name: string;
+  system: GameSystem;
+  path: string;
+  biosPath: string | null;
+  itemCount: number;
+  lastScannedAt: number | null;
+  createdAt: number;
+}
+
+export interface GameItem {
+  id: string;
+  libraryId: string;
+  libraryName: string;
+  title: string;
+  system: GameSystem;
+  systemLabel: string;
+  extension: string;
+  fileSize: number;
+  coverUrl: string | null;
+  backgroundUrl: string | null;
+  addedAt: number;
+  lastPlayedAt: number | null;
+  playCount: number;
+  favorite: boolean;
+}
+
+export interface ArcadeFeed {
+  games: GameItem[];
+  recentlyPlayed: GameItem[];
+  favorites: GameItem[];
+}
+
+export interface PlayableGame extends GameItem {
+  romUrl: string;
+  biosUrl: string | null;
+  storageId: number;
+}

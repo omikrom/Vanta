@@ -20,6 +20,7 @@
 # production
 /build
 /data
+/public/emulatorjs
 
 # misc
 .DS_Store
