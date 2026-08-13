@@ -3,20 +3,22 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
-import { ArrowLeft, CheckCircle2, Film, FolderOpen, HardDrive, LoaderCircle, Music2, Plus, RefreshCw, Server, ShieldCheck, Trash2, Tv, UserPlus, UserRound } from "lucide-react";
+import { ArrowLeft, CheckCircle2, Film, FolderOpen, Gamepad2, LoaderCircle, Music2, Plus, RefreshCw, Server, ShieldCheck, Trash2, Tv, UserPlus, UserRound } from "lucide-react";
+import { ArcadeAdmin } from "@/components/arcade-admin";
 import { VantaMark } from "@/components/brand";
 import { YouTubeImporter } from "@/components/youtube-importer";
-import type { Library, MediaKind, SafeUser } from "@/lib/types";
+import type { GameLibrary, Library, MediaKind, SafeUser } from "@/lib/types";
 
 function kindIcon(kind: MediaKind) { if (kind === "music") return <Music2 />; if (kind === "series") return <Tv />; return <Film />; }
 
-export function AdminPanel({ user, libraries, users }: { user: SafeUser; libraries: Library[]; users: SafeUser[] }) {
+export function AdminPanel({ user, libraries, gameLibraries, users }: { user: SafeUser; libraries: Library[]; gameLibraries: GameLibrary[]; users: SafeUser[] }) {
   const router = useRouter();
   const [adding, setAdding] = useState(false);
   const [addingViewer, setAddingViewer] = useState(false);
   const [workingId, setWorkingId] = useState<string | null>(null);
   const [error, setError] = useState("");
   const totalItems = libraries.reduce((total, library) => total + library.itemCount, 0);
+  const totalGames = gameLibraries.reduce((total, library) => total + library.itemCount, 0);
 
   async function add(event: FormEvent<HTMLFormElement>) {
     event.preventDefault(); setError(""); setWorkingId("new");
@@ -60,18 +62,19 @@ export function AdminPanel({ user, libraries, users }: { user: SafeUser; librari
       <header className="admin-nav"><Link href="/browse"><VantaMark /></Link><Link className="back-link" href="/browse"><ArrowLeft size={17} />Back to Vanta</Link></header>
       <main className="admin-main">
         <div className="admin-heading"><div><span className="eyebrow">VANTA CONTROL ROOM</span><h1>Your server, at a glance.</h1><p>Connected as {user.displayName}. Libraries are read from the folders below; Vanta never moves the originals.</p></div><button className="primary-button" onClick={() => setAdding(true)}><Plus size={18} />Add library</button></div>
-        <section className="stats-grid"><article><span><Server /></span><div><strong>{libraries.length}</strong><small>Connected libraries</small></div></article><article><span><Film /></span><div><strong>{totalItems}</strong><small>Indexed titles</small></div></article><article><span><ShieldCheck /></span><div><strong>{users.length}</strong><small>People with access</small></div></article><article><span><HardDrive /></span><div><strong>Files</strong><small>Private NAS workspace ready</small></div></article></section>
+        <section className="stats-grid"><article><span><Server /></span><div><strong>{libraries.length + gameLibraries.length}</strong><small>Connected libraries</small></div></article><article><span><Film /></span><div><strong>{totalItems}</strong><small>Indexed media titles</small></div></article><article><span><Gamepad2 /></span><div><strong>{totalGames}</strong><small>Arcade games</small></div></article><article><span><ShieldCheck /></span><div><strong>{users.length}</strong><small>People with access</small></div></article></section>
         {error && <p className="admin-error">{error}</p>}
         <section className="admin-section">
           <div className="admin-section-heading"><div><h2>Media libraries</h2><p>Scan folders again whenever you add or rename files.</p></div></div>
           {!libraries.length ? <div className="admin-empty"><FolderOpen size={42} /><h3>No folders connected</h3><p>Add the folders where you keep your movies, series or music.</p><button className="secondary-button" onClick={() => setAdding(true)}><Plus size={18} />Connect a folder</button></div> : <div className="library-list">{libraries.map((library) => <article className="library-item" key={library.id}><span className={`library-icon icon-${library.kind}`}>{kindIcon(library.kind)}</span><div className="library-copy"><div><h3>{library.name}</h3><span>{library.kind}</span></div><code>{library.path}</code><p>{library.itemCount} items · {library.lastScannedAt ? `Scanned ${new Date(library.lastScannedAt).toLocaleString()}` : "Not scanned yet"}</p></div><div className="library-actions"><button onClick={() => void scan(library.id)} disabled={Boolean(workingId)} title="Scan now">{workingId === library.id ? <LoaderCircle className="spin" /> : <RefreshCw />}</button><button className="danger-icon" onClick={() => void remove(library.id, library.name)} disabled={Boolean(workingId)} title="Remove library"><Trash2 /></button></div></article>)}</div>}
         </section>
+        <ArcadeAdmin libraries={gameLibraries} />
         <YouTubeImporter libraries={libraries} />
         <section className="admin-section">
           <div className="admin-section-heading split-heading"><div><h2>People with access</h2><p>Viewer accounts have access to every media library, but not the control room.</p></div><button className="secondary-button" onClick={() => setAddingViewer(true)}><UserPlus size={17} />Add viewer</button></div>
           <div className="people-list">{users.map((person) => <article key={person.id}><span className="person-avatar">{person.displayName.slice(0, 1).toUpperCase()}</span><div><strong>{person.displayName}</strong><small>@{person.username} · {person.role === "admin" ? "Owner" : "Viewer"}</small></div>{person.role === "viewer" && <button onClick={() => void removeViewer(person)} disabled={Boolean(workingId)} title="Remove access"><Trash2 /></button>}</article>)}</div>
         </section>
-        <section className="next-section"><div><span className="eyebrow">VANTA KEEPS GROWING</span><h2>Your server, under one roof.</h2><p>Media, private files and trusted viewers now share one secure foundation. TV navigation, collections and smarter automation come next.</p></div><div className="roadmap-pills"><span><CheckCircle2 />Secure users</span><span><CheckCircle2 />Media streaming</span><span><CheckCircle2 />File workspace</span></div></section>
+        <section className="next-section"><div><span className="eyebrow">VANTA KEEPS GROWING</span><h2>Your server, under one roof.</h2><p>Media, private files, retro games and trusted viewers now share one secure foundation. Collections and smarter automation come next.</p></div><div className="roadmap-pills"><span><CheckCircle2 />Media streaming</span><span><CheckCircle2 />File workspace</span><span><CheckCircle2 />Browser arcade</span></div></section>
       </main>
       {adding && <div className="dialog-scrim" onMouseDown={(event) => event.target === event.currentTarget && setAdding(false)}><form className="library-dialog" onSubmit={add}><div className="dialog-heading"><div><span className="dialog-icon"><FolderOpen /></span><div><h2>Connect a library</h2><p>Vanta will read this folder and its subfolders.</p></div></div><button type="button" onClick={() => setAdding(false)}>×</button></div><label><span>Library name</span><input name="name" placeholder="e.g. Movies" required /></label><label><span>What lives here?</span><select name="kind" defaultValue="movie"><option value="movie">Movies</option><option value="series">TV series</option><option value="music">Music</option></select></label><label><span>Folder path on the server</span><input name="path" placeholder="/media/movies or D:\Media\Movies" required /><small>When using Docker, use the path inside the container, such as /media/movies.</small></label>{error && <p className="form-error">{error}</p>}<div className="dialog-actions"><button type="button" className="text-button" onClick={() => setAdding(false)}>Cancel</button><button className="primary-button" disabled={Boolean(workingId)}>{workingId === "new" ? <LoaderCircle className="spin" size={18} /> : <Plus size={18} />}Add and scan</button></div></form></div>}
       {addingViewer && <div className="dialog-scrim" onMouseDown={(event) => event.target === event.currentTarget && setAddingViewer(false)}><form className="library-dialog" onSubmit={addViewer}><div className="dialog-heading"><div><span className="dialog-icon"><UserRound /></span><div><h2>Add a viewer</h2><p>Give someone their own private sign-in.</p></div></div><button type="button" onClick={() => setAddingViewer(false)}>×</button></div><label><span>Display name</span><input name="displayName" placeholder="e.g. Karlie" maxLength={50} required /></label><label><span>Username</span><input name="username" placeholder="e.g. karlie" minLength={3} maxLength={32} pattern="[a-zA-Z0-9._-]+" required /></label><label><span>Temporary password</span><input name="password" type="password" placeholder="At least 10 characters" minLength={10} maxLength={128} required /><small>Send this securely. Password-changing and invitations come in a later account update.</small></label>{error && <p className="form-error">{error}</p>}<div className="dialog-actions"><button type="button" className="text-button" onClick={() => setAddingViewer(false)}>Cancel</button><button className="primary-button" disabled={Boolean(workingId)}>{workingId === "viewer" ? <LoaderCircle className="spin" size={18} /> : <UserPlus size={18} />}Create viewer</button></div></form></div>}

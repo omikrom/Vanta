@@ -19,3 +19,5 @@ services:
       - /path/to/music:/media/music
       # General file storage is writable for the Vanta Files workspace.
       - /path/to/files:/storage
+      # ROMs and any BIOS files are read-only; configure their paths in Arcade.
+      - /path/to/games:/games:ro

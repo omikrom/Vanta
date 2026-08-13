@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRef, useState, type ChangeEvent, type FormEvent } from "react";
 import {
   Archive, ChevronRight, Download, File, FileImage, FileSpreadsheet, FileText,
-  Film, Folder, FolderLock, FolderOpen, HardDrive, Home, LoaderCircle,
+  Film, Folder, FolderLock, FolderOpen, Gamepad2, HardDrive, Home, LoaderCircle,
   LockKeyhole, Music2, Pencil, Plus, RefreshCw, Search, ShieldCheck,
   Trash2, Upload, Users, X,
 } from "lucide-react";
@@ -174,7 +174,7 @@ export function FileWorkspace({ user, initialRoots, initialDirectory }: {
     <div className="file-shell">
       <header className="file-nav">
         <Link href="/browse"><VantaMark /></Link>
-        <nav><Link href="/browse">Home</Link><Link href="/browse?view=movies">Movies</Link><Link href="/browse?view=series">Series</Link><Link href="/browse?view=music">Music</Link><span>Files</span></nav>
+        <nav><Link href="/browse">Home</Link><Link href="/browse?view=movies">Movies</Link><Link href="/browse?view=series">Series</Link><Link href="/browse?view=music">Music</Link><span>Files</span><Link href="/arcade"><Gamepad2 />Arcade</Link></nav>
         <div><button aria-label="Refresh files" onClick={() => rootId && void loadDirectory(rootId, currentPath)} disabled={loading}><RefreshCw className={loading ? "spin" : ""} /></button><span className="avatar">{user.displayName.slice(0, 1).toUpperCase()}</span></div>
       </header>
 

@@ -3,14 +3,16 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "next build && node scripts/prepare-standalone.mjs",
+    "prepare:emulator": "node scripts/prepare-emulator.mjs",
+    "dev": "npm run prepare:emulator && next dev",
+    "build": "npm run prepare:emulator && next build && node scripts/prepare-standalone.mjs",
     "start": "node .next/standalone/server.js",
     "lint": "eslint --max-warnings=0",
     "test": "vitest run",
     "check": "npm run lint && npm run test && npm run build"
   },
   "dependencies": {
+    "@emulatorjs/emulatorjs": "^4.2.3",
     "bcryptjs": "^3.0.3",
     "better-sqlite3": "^13.0.3",
     "busboy": "^1.6.0",
@@ -35,5 +37,8 @@
     "tailwindcss": "^4",
     "typescript": "^5",
     "vitest": "^4.1.10"
+  },
+  "overrides": {
+    "glob": "^10.5.0"
   }
 }
