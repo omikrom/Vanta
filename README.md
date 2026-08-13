@@ -24,6 +24,9 @@ The current release combines the media foundation with the first functional NAS 
 - Self-hosted [EmulatorJS](https://emulatorjs.org/) runtime with 21 selected emulator cores
 - Per-user Arcade activity plus browser-local save states and game saves
 - Owner-managed ROM folders, optional BIOS files and one verified open-source NES demo
+- Private Vanta Lounge with invite-only Watch Together rooms
+- Synchronized play, pause and seeking with ready-up, shared countdown and drift correction
+- Live room presence, buffering indicators, chat and quick reactions
 - Owner-only YouTube search and authorised audio import into artist/album folders
 - Private and shared file-storage locations backed by ordinary server folders
 - Folder browsing, multi-file streaming uploads, downloads and rename operations
@@ -117,6 +120,16 @@ The Arcade can be navigated with a mouse, keyboard or gamepad. Directional contr
 
 **Install free demo** adds the [NES Starter Kit](https://github.com/igwgames/nes-starter-kit) example game. Vanta verifies its pinned SHA-256 before saving it. The example code is MIT licensed and its bundled art/music resources are CC0. Vanta does not include, discover or download commercial ROMs.
 
+## Watch together in Vanta Lounge
+
+Open a film or episode and choose **Watch together**, or create a room from **Lounge**. Select the Vanta profiles to invite and decide whether only the host or everyone can control playback. Rooms are visible only to the host and invited profiles.
+
+Everyone joins the lobby and marks themselves ready. The host starts a shared three-second countdown, after which Vanta keeps each browser on the same playback clock. Small differences are corrected gently through playback speed; larger differences seek to the shared position. Someone joining late is moved to the current position automatically.
+
+Room presence shows who is ready, playing, away or buffering. Chat and quick reactions travel over Vanta's authenticated live event stream and remain on your server. Browsers may require a final tap before synchronized playback because of their autoplay policies.
+
+Each participant streams the title independently. Approximate server bandwidth is the title bitrate multiplied by the number of remote viewers—for example, five viewers of a 10 Mbps stream can require roughly 50 Mbps upload. Converted HLS output is generated once and reused, but each viewer still downloads their own segments.
+
 ## Import authorised audio from YouTube
 
 Open **Control room → YouTube Import**, search for a song or performance, and choose **Import audio**. Vanta asks you for:
@@ -167,7 +180,7 @@ Uploads stream directly to disk instead of buffering the entire file in memory. 
 
 Do not expose port 3000 directly to the public internet. Put Vanta behind HTTPS using a reverse proxy such as Caddy, Nginx or Cloudflare Tunnel, then set `VANTA_SECURE_COOKIES=true`. A private mesh VPN such as Tailscale is also a good fit for family-only access.
 
-The application checks authorization again at every media, ROM, BIOS, artwork, progress, library, file and account endpoint. Stored Arcade paths are resolved and confined again when served, so a file swapped for a symbolic link is rejected. Server paths are never included in viewer-facing objects.
+The application checks authorization again at every media, ROM, BIOS, artwork, progress, library, file, Lounge and account endpoint. Watch rooms are invite-only, and playback controls enforce their selected host/everyone policy on the server. Stored Arcade paths are resolved and confined again when served, so a file swapped for a symbolic link is rejected. Server paths are never included in viewer-facing objects.
 
 Only download, store and share media you have the legal right to use. Viewer accounts are intended for private household/family use, not running a public streaming service.
 
@@ -191,6 +204,8 @@ src/server/media/    Filename parsing, scanning, metadata and queries
 src/server/playback.ts  Byte ranges and FFmpeg HLS preparation
 src/server/files.ts     Storage-root jailing and file operations
 src/server/games.ts     ROM scanning, Arcade activity and protected assets
+src/server/lounge.ts    Private rooms, presence, chat and playback state
+src/server/lounge-events.ts  Live Watch Together room event stream
 scripts/prepare-emulator.mjs  Selected self-hosted EmulatorJS assets
 data/                Runtime SQLite database and cache (gitignored)
 ```
@@ -205,6 +220,7 @@ data/                Runtime SQLite database and cache (gitignored)
 - Subtitle discovery and track selection
 - Hardware-accelerated transcoding profiles
 - Native TV/PWA install experience
-- Collections, playlists and favourites
+- Lounge recommendations, shared lists and movie-night polls
+- Collections, playlists and media favourites
 
 Vanta is early software. Keep a backup of its `data` folder, and always keep irreplaceable original media backed up separately.

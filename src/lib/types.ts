@@ -133,3 +133,61 @@ export interface PlayableGame extends GameItem {
   biosUrl: string | null;
   storageId: number;
 }
+
+export type WatchRoomStatus = "waiting" | "playing" | "paused" | "ended";
+export type WatchRoomControlMode = "host" | "everyone";
+export type WatchPresenceState = "joining" | "ready" | "playing" | "paused" | "buffering";
+
+export interface LoungePerson extends SafeUser {
+  online: boolean;
+}
+
+export interface WatchRoomMember {
+  userId: string;
+  displayName: string;
+  isHost: boolean;
+  ready: boolean;
+  online: boolean;
+  playbackState: WatchPresenceState;
+  position: number;
+}
+
+export interface WatchRoomMessage {
+  id: string;
+  userId: string;
+  displayName: string;
+  kind: "message" | "reaction";
+  body: string;
+  createdAt: number;
+}
+
+export interface WatchRoomSummary {
+  id: string;
+  media: MediaItem;
+  hostUserId: string;
+  hostDisplayName: string;
+  status: WatchRoomStatus;
+  controlMode: WatchRoomControlMode;
+  position: number;
+  duration: number | null;
+  stateUpdatedAt: number;
+  playAt: number | null;
+  createdAt: number;
+  memberCount: number;
+  invitedCount: number;
+  isHost: boolean;
+  joined: boolean;
+  ready: boolean;
+}
+
+export interface WatchRoomSnapshot extends WatchRoomSummary {
+  serverNow: number;
+  members: WatchRoomMember[];
+  messages: WatchRoomMessage[];
+}
+
+export interface LoungeFeed {
+  people: LoungePerson[];
+  rooms: WatchRoomSummary[];
+  watchableMedia: MediaItem[];
+}

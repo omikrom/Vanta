@@ -136,6 +136,51 @@ function openDatabase() {
     );
 
     CREATE INDEX IF NOT EXISTS game_activity_recent_idx ON game_activity(user_id, last_played_at DESC);
+
+    CREATE TABLE IF NOT EXISTS watch_rooms (
+      id TEXT PRIMARY KEY,
+      host_user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      media_id TEXT NOT NULL REFERENCES media_items(id) ON DELETE CASCADE,
+      status TEXT NOT NULL DEFAULT 'waiting' CHECK(status IN ('waiting', 'playing', 'paused', 'ended')),
+      control_mode TEXT NOT NULL DEFAULT 'host' CHECK(control_mode IN ('host', 'everyone')),
+      position REAL NOT NULL DEFAULT 0,
+      duration REAL,
+      state_updated_at INTEGER NOT NULL,
+      play_at INTEGER,
+      created_at INTEGER NOT NULL,
+      ended_at INTEGER
+    );
+
+    CREATE TABLE IF NOT EXISTS watch_room_invites (
+      room_id TEXT NOT NULL REFERENCES watch_rooms(id) ON DELETE CASCADE,
+      user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      invited_at INTEGER NOT NULL,
+      PRIMARY KEY(room_id, user_id)
+    );
+
+    CREATE TABLE IF NOT EXISTS watch_room_members (
+      room_id TEXT NOT NULL REFERENCES watch_rooms(id) ON DELETE CASCADE,
+      user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      ready INTEGER NOT NULL DEFAULT 0,
+      playback_state TEXT NOT NULL DEFAULT 'joining' CHECK(playback_state IN ('joining', 'ready', 'playing', 'paused', 'buffering')),
+      last_position REAL NOT NULL DEFAULT 0,
+      last_seen_at INTEGER NOT NULL,
+      joined_at INTEGER NOT NULL,
+      PRIMARY KEY(room_id, user_id)
+    );
+
+    CREATE TABLE IF NOT EXISTS watch_room_messages (
+      id TEXT PRIMARY KEY,
+      room_id TEXT NOT NULL REFERENCES watch_rooms(id) ON DELETE CASCADE,
+      user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      kind TEXT NOT NULL CHECK(kind IN ('message', 'reaction')),
+      body TEXT NOT NULL,
+      created_at INTEGER NOT NULL
+    );
+
+    CREATE INDEX IF NOT EXISTS watch_rooms_active_idx ON watch_rooms(ended_at, created_at DESC);
+    CREATE INDEX IF NOT EXISTS watch_room_invites_user_idx ON watch_room_invites(user_id, room_id);
+    CREATE INDEX IF NOT EXISTS watch_room_messages_room_idx ON watch_room_messages(room_id, created_at DESC);
   `);
 
   return database;

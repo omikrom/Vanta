@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import {
   Film, FolderOpen, Gamepad2, Heart, Home, LogOut, Menu, Music2,
-  Play, Search, Settings, Sparkles, Tv, X, Zap,
+  Play, Search, Settings, Sparkles, Tv, Users, X, Zap,
 } from "lucide-react";
 import { VantaMark } from "@/components/brand";
 import type { ArcadeFeed, GameItem, SafeUser } from "@/lib/types";
@@ -135,7 +135,7 @@ export function ArcadeShell({ user, feed }: { user: SafeUser; feed: ArcadeFeed }
       <header className="top-nav arcade-nav">
         <Link href="/browse" className="brand-link"><VantaMark /></Link>
         <nav className={mobileMenu ? "nav-links nav-links-open" : "nav-links"}>
-          <Link href="/browse"><Home />Home</Link><Link href="/browse?view=movies"><Film />Movies</Link><Link href="/browse?view=series"><Tv />Series</Link><Link href="/browse?view=music"><Music2 />Music</Link><Link href="/files"><FolderOpen />Files</Link><Link href="/arcade" className="active"><Gamepad2 />Arcade</Link>
+          <Link href="/browse"><Home />Home</Link><Link href="/browse?view=movies"><Film />Movies</Link><Link href="/browse?view=series"><Tv />Series</Link><Link href="/browse?view=music"><Music2 />Music</Link><Link href="/files"><FolderOpen />Files</Link><Link href="/arcade" className="active"><Gamepad2 />Arcade</Link><Link href="/lounge"><Users />Lounge</Link>
         </nav>
         <div className="nav-actions"><span className={controllerConnected ? "controller-status connected" : "controller-status"}><Gamepad2 />{controllerConnected ? "Controller ready" : "Connect controller"}</span>{user.role === "admin" && <Link href="/admin" aria-label="Server settings"><Settings /></Link>}<div className="user-menu"><button className="avatar" title={user.displayName}>{user.displayName.slice(0, 1).toUpperCase()}</button><div className="user-popover"><strong>{user.displayName}</strong><span>{user.role === "admin" ? "Vanta owner" : "Player"}</span><button onClick={() => void logout()}><LogOut />Sign out</button></div></div><button className="mobile-menu-button" onClick={() => setMobileMenu((open) => !open)} aria-label="Open menu">{mobileMenu ? <X /> : <Menu />}</button></div>
       </header>
@@ -151,7 +151,7 @@ export function ArcadeShell({ user, feed }: { user: SafeUser; feed: ArcadeFeed }
         </div>
       </main>}
 
-      <nav className="bottom-nav arcade-bottom-nav"><Link href="/browse"><Home /><span>Home</span></Link><Link href="/browse?view=movies"><Film /><span>Movies</span></Link><Link href="/browse?view=series"><Tv /><span>Series</span></Link><Link href="/browse?view=music"><Music2 /><span>Music</span></Link><Link href="/files"><FolderOpen /><span>Files</span></Link><Link className="active" href="/arcade"><Gamepad2 /><span>Arcade</span></Link></nav>
+      <nav className="bottom-nav arcade-bottom-nav"><Link href="/browse"><Home /><span>Home</span></Link><Link href="/browse?view=movies"><Film /><span>Movies</span></Link><Link href="/browse?view=series"><Tv /><span>Series</span></Link><Link href="/browse?view=music"><Music2 /><span>Music</span></Link><Link href="/files"><FolderOpen /><span>Files</span></Link><Link className="active" href="/arcade"><Gamepad2 /><span>Arcade</span></Link><Link href="/lounge"><Users /><span>Lounge</span></Link></nav>
     </div>
   );
 }

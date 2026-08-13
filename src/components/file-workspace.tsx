@@ -174,7 +174,7 @@ export function FileWorkspace({ user, initialRoots, initialDirectory }: {
     <div className="file-shell">
       <header className="file-nav">
         <Link href="/browse"><VantaMark /></Link>
-        <nav><Link href="/browse">Home</Link><Link href="/browse?view=movies">Movies</Link><Link href="/browse?view=series">Series</Link><Link href="/browse?view=music">Music</Link><span>Files</span><Link href="/arcade"><Gamepad2 />Arcade</Link></nav>
+        <nav><Link href="/browse">Home</Link><Link href="/browse?view=movies">Movies</Link><Link href="/browse?view=series">Series</Link><Link href="/browse?view=music">Music</Link><span>Files</span><Link href="/arcade"><Gamepad2 />Arcade</Link><Link href="/lounge"><Users />Lounge</Link></nav>
         <div><button aria-label="Refresh files" onClick={() => rootId && void loadDirectory(rootId, currentPath)} disabled={loading}><RefreshCw className={loading ? "spin" : ""} /></button><span className="avatar">{user.displayName.slice(0, 1).toUpperCase()}</span></div>
       </header>
 
