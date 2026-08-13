@@ -1,0 +1,21 @@
+services:
+  vanta:
+    build: .
+    container_name: vanta
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      VANTA_DATA_DIR: /data
+      VANTA_CACHE_DIR: /data/cache
+      VANTA_SECURE_COOKIES: "false"
+      # TMDB_API_KEY: "your-key"
+    volumes:
+      - ./data:/data
+      # Change these paths to match the media folders on your server.
+      - /path/to/movies:/media/movies:ro
+      - /path/to/series:/media/series:ro
+      # Music is writable so authorised YouTube imports can be filed here.
+      - /path/to/music:/media/music
+      # General file storage is writable for the Vanta Files workspace.
+      - /path/to/files:/storage
